@@ -1,5 +1,5 @@
 <?php
-<?php
+
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
 session_start();
@@ -7,16 +7,10 @@ if (!isset($_SESSION["login"])) {
     header("Location: index.php");
     exit;
 }
-$conn = new mysqli("localhost", "root", "", "crud_restoran");
-if ($conn->connect_error) die("Connection failed: " . $conn->connect_error);
-
-$conn->query("CREATE DATABASE IF NOT EXISTS crud_restoran");
-$conn->select_db("crud_restoran");
-$conn->query("CREATE TABLE IF NOT EXISTS menu (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nama VARCHAR(100),
-    harga INT
-)");
+/$conn = new mysqli("localhost", "root", "", "crud_restoran");
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
 if (isset($_POST["update"])) {
     $id = $_POST["id"];
