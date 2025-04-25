@@ -4,9 +4,9 @@ if (!isset($_SESSION["login"])) {
     header("Location: index.php");
     exit;
 }
-$conn = new mysqli("localhost", "root", "", "crud_restoran");
-if ($conn->connect_error) die("Connection failed: " . $conn->connect_error);
+require 'config.php';
 
+// Buat tabel jika belum ada
 $conn->query("CREATE TABLE IF NOT EXISTS transaksi (
     id INT AUTO_INCREMENT PRIMARY KEY,
     menu_id INT,
@@ -16,8 +16,6 @@ $conn->query("CREATE TABLE IF NOT EXISTS transaksi (
     FOREIGN KEY(menu_id) REFERENCES menu(id)
 )");
 
-$menus = $conn->query("SELECT * FROM menu");
-
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $menu_id = $_POST["menu_id"];
     $jumlah = $_POST["jumlah"];
@@ -26,11 +24,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $conn->query("INSERT INTO transaksi (menu_id, jumlah, total) VALUES ($menu_id, $jumlah, $total)");
 }
 
+$menus = $conn->query("SELECT * FROM menu");
+$result = $conn->query("SELECT t.*, m.nama FROM transaksi t JOIN menu m ON t.menu_id = m.id ORDER BY t.tanggal DESC");
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Pesanan</title>
+    <title>Pesanan & Riwayat</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
@@ -53,6 +53,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <button class="btn btn-primary w-100">Simpan</button>
         </div>
     </form>
+
+    <h4>Riwayat Transaksi</h4>
+    <table class="table table-bordered">
+        <thead><tr><th>#</th><th>Menu</th><th>Jumlah</th><th>Total</th><th>Tanggal</th></tr></thead>
+        <tbody>
+            <?php $i = 1; while ($row = $result->fetch_assoc()): ?>
+                <tr>
+                    <td><?= $i++ ?></td>
+                    <td><?= $row["nama"] ?></td>
+                    <td><?= $row["jumlah"] ?></td>
+                    <td>Rp<?= number_format($row["total"]) ?></td>
+                    <td><?= $row["tanggal"] ?></td>
+                </tr>
+            <?php endwhile; ?>
+        </tbody>
+    </table>
 </div>
 </body>
 </html>

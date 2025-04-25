@@ -7,7 +7,9 @@ if (!isset($_SESSION["login"])) {
     header("Location: index.php");
     exit;
 }
-/$conn = new mysqli("localhost", "root", "", "crud_restoran");
+
+require 'config.php'; // koneksi dari config.php
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
